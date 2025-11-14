@@ -1,0 +1,53 @@
+replicaCount: 1
+
+app:
+  label: django-notes
+
+image:
+  repository: django-notes
+  tag: latest
+  pullPolicy: IfNotPresent
+
+containerPort: 8000
+postgres:
+  host: postgres
+  database: notesdb
+  imageTag: "13"
+  user: notesuser
+  # This should be the name of an existing Kubernetes Secret (do NOT put password plaintext here)
+  secretName: db-secret
+  # the key inside that secret that contains the password
+  secretKey: POSTGRES_PASSWORD
+  service:
+    port: 5432
+  config:
+    dbName: notesdb
+    dbUser: notesuser
+  secret:
+    password: notespwd
+  storage:
+    size: 1Gi
+    className: local-path
+    accessModes:
+      - ReadWriteOnce
+resources: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  host: django.127.0.0.1.nip.io
+  path: /
+  pathType: Prefix
+
+
+# Example resources:
+# resources:
+#   limits:
+#     cpu: "500m"
+#     memory: "512Mi"
+#   requests:
+#     cpu: "100m"
+#     memory: "128Mi"

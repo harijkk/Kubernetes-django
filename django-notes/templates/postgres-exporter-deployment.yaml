@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-postgres-exporter
+  labels:
+    app: {{ .Values.app.label }}-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.label }}-exporter
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.label }}-exporter
+    spec:
+      containers:
+        - name: postgres-exporter
+          image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 9187
+          env:
+            - name: DATA_SOURCE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.secretName }}
+                  key: DATA_SOURCE_NAME
